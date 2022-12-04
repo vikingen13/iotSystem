@@ -4,6 +4,8 @@ __pycache__
 .pytest_cache
 .venv
 *.egg-info
+certificates/*/
+esp8266tempsensors/sensors/*/
 
 # CDK asset staging directory
 .cdk.staging
