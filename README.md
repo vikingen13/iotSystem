@@ -41,6 +41,7 @@ iotSystem/
     |   |- esp8266tempsensors.py
     |   |- code/
     |   |- sensors/
+````
 
 There is a certificate folder where the things certificates will be stored.
 
