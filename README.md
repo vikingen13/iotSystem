@@ -27,6 +27,21 @@ The code has an opinionated folder structure.
 
 The deployment is performed using AWS CDK and a makefile.
 
+```
+iotSystem/
+    |
+    |- Makefile
+    |
+    |- certificates/ 
+    |
+    |- iot_system_infra/    
+    |   |- iot_system_infra_stack.py
+    |
+    |- esp8266tempsensors/
+    |   |- esp8266tempsensors.py
+    |   |- code/
+    |   |- sensors/
+
 There is a certificate folder where the things certificates will be stored.
 
 There is a folder per sensor type (e.g. esp8266tempsensors for temperature sensors based on esp8266).
