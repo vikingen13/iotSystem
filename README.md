@@ -96,7 +96,3 @@ make esp8266TempSensor name=YOURDBNAME
 
 * `make esp8266TempSensorDelete name=THINGNAME` delete the THINGNAME sensor
 
-## Additional note
-The esp8266TempSensor is implemented in micro python on esp8266 devices flashed with the following firmware:
-
-You can copy the files on the device using the esptool.py
