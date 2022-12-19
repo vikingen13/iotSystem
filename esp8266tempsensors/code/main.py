@@ -26,6 +26,7 @@ WIFI_PW = "PUT_WIFI_PASSWORD_HERE"
 
 def connect_wifi(ssid, pw):
     wlan = WLAN(STA_IF)
+    wlan.active(True)
     nets = wlan.scan()
     if(wlan.isconnected()):
         wlan.disconnect()            
@@ -61,7 +62,7 @@ def connect_mqtt():
 
         print("Got Cert")	
 
-        mqtt_client = MQTTClient(client_id=MQTT_CLIENT_ID, server=MQTT_HOST, port=MQTT_PORT, keepalive=5000, ssl=True, ssl_params={"cert":cert, "key":key, "server_side":False})
+        mqtt_client = MQTTClient(client_id=MQTT_CLIENT_ID, server=MQTT_HOST, port=MQTT_PORT, keepalive=1200, ssl=True, ssl_params={"cert":cert, "key":key, "server_side":False})
         mqtt_client.connect()
         print('MQTT Connected')
 

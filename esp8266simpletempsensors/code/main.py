@@ -16,7 +16,7 @@ MQTT_CLIENT_ID = THINGNAME
 MQTT_PORT = 8883
 
 #if you change the topic make sure update AWS policy
-MQTT_TOPIC = "esp8266tempsensors/{}".format(THINGNAME)
+MQTT_TOPIC = "esp8266simpletempsensors/{}".format(THINGNAME)
 
 #Change the following three settings to match your environment
 MQTT_HOST = "PUT_MQTT_HOST_HERE"
@@ -25,6 +25,7 @@ WIFI_PW = "PUT_WIFI_PASSWORD_HERE"
 
 def connect_wifi(ssid, pw):
     wlan = WLAN(STA_IF)
+    wlan.active(True)
     nets = wlan.scan()
     if(wlan.isconnected()):
         wlan.disconnect()            
@@ -60,7 +61,7 @@ def connect_mqtt():
 
         print("Got Cert")	
 
-        mqtt_client = MQTTClient(client_id=MQTT_CLIENT_ID, server=MQTT_HOST, port=MQTT_PORT, keepalive=5000, ssl=True, ssl_params={"cert":cert, "key":key, "server_side":False})
+        mqtt_client = MQTTClient(client_id=MQTT_CLIENT_ID, server=MQTT_HOST, port=MQTT_PORT, keepalive=1200, ssl=True, ssl_params={"cert":cert, "key":key, "server_side":False})
         mqtt_client.connect()
         print('MQTT Connected')
 
