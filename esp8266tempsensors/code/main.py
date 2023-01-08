@@ -26,7 +26,8 @@ WIFI_PW = "PUT_WIFI_PASSWORD_HERE"
 
 def connect_wifi(ssid, pw):
     wlan = WLAN(STA_IF)
-    wlan.active(True)
+    if not wlan.active():
+        wlan.active(True)
     nets = wlan.scan()
     if(wlan.isconnected()):
         wlan.disconnect()            
@@ -44,6 +45,9 @@ def pub_msg(msg):
     try:    
         mqtt_client.publish(MQTT_TOPIC, msg)
         print("Sent: " + msg)
+        #this sleep is here to avoid that we disconnect before the message is published
+        sleep(10)
+
     except Exception as e:
         print("Exception publish: " + str(e))
         raise

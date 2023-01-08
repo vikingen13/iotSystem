@@ -7,7 +7,7 @@ CREATECERT = aws iot create-keys-and-certificate \
 RETRIEVECERT = aws iot list-thing-principals --thing-name $(name) | jq -r .principals[0]
 ENDPOINT = aws iot describe-endpoint --endpoint-type iot:Data-ATS |jq -r .endpointAddress
 
-all: esp8266TempSensorType allInfra
+all: esp8266TempSensorType esp8266SimpleTempSensor allInfra
 
 allInfra: 
 	source .venv/bin/activate; \
@@ -29,7 +29,7 @@ esp8266SimpleTempSensorType:
 
 esp8266SimpleTempSensorInfraOnly:
 	source .venv/bin/activate; \
-	cdk deploy esp8266simpletempsensors --parameters timeStreamDBName=$(dbName)
+	cdk deploy esp8266simpletempsensors --parameters timeStreamDBName=$(dbName) --parameters emailforalarms=$(emailforalarms)
 
 esp8266TempSensorCreate:
 	echo "creating sensor"

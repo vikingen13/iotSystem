@@ -5,6 +5,8 @@ from network import STA_IF
 from umqtt.robust import MQTTClient
 import onewire, ds18x20
 
+MQTT_CONNECT_NUMBER_OF_RETRY = 3
+
 THINGNAME = "PUT_THING_NAME_HERE"
 
 #This works for either ESP8266 ESP32 if you rename certs before moving into /flash 
@@ -25,7 +27,9 @@ WIFI_PW = "PUT_WIFI_PASSWORD_HERE"
 
 def connect_wifi(ssid, pw):
     wlan = WLAN(STA_IF)
-    wlan.active(True)
+    if not wlan.active():
+        wlan.active(True)
+
     nets = wlan.scan()
     if(wlan.isconnected()):
         wlan.disconnect()            
@@ -43,6 +47,7 @@ def pub_msg(msg):
     try:    
         mqtt_client.publish(MQTT_TOPIC, msg)
         print("Sent: " + msg)
+        sleep(10)
     except Exception as e:
         print("Exception publish: " + str(e))
         raise
@@ -62,9 +67,20 @@ def connect_mqtt():
         print("Got Cert")	
 
         mqtt_client = MQTTClient(client_id=MQTT_CLIENT_ID, server=MQTT_HOST, port=MQTT_PORT, keepalive=1200, ssl=True, ssl_params={"cert":cert, "key":key, "server_side":False})
-        mqtt_client.connect()
-        print('MQTT Connected')
 
+        myNumberOfRetry = MQTT_CONNECT_NUMBER_OF_RETRY
+        
+        while myNumberOfRetry > 0:
+            myNumberOfRetry -= 1
+            try:
+                mqtt_client.connect()
+                print('MQTT Connected')
+                return
+            except Exception as e:
+                print('Cannot connect MQTT: ' + str(e))
+                print('but we got more tries '+ str(myNumberOfRetry))
+        
+        raise Exception('Impossible to connect')
         
     except Exception as e:
         print('Cannot connect MQTT: ' + str(e))
@@ -73,6 +89,8 @@ def connect_mqtt():
 def disconnect_mqtt():    
     global mqtt_client
     mqtt_client.disconnect()
+    sleep(10)
+
     print('MQTT disconnected')
 
 def deep_sleep(msecs):
@@ -115,4 +133,5 @@ except Exception as e:
     print('but we must continue to run')
 
 deep_sleep(300000)
+
 
