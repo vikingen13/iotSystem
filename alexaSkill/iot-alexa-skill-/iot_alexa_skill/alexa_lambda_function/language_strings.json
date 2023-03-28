@@ -1,0 +1,14 @@
+{
+	"fr": {
+		"SKILL_NAME": "Mon thermomètre",
+        "WELCOME_MESSAGE": "Bienvenue dans la skill mon thermomètre, comment puis je vous aider?",
+        "SENSOR_LIST_MESSAGE": "Les capteurs suivants sont disponibles: {}",
+		"HELP_MESSAGE": "Vous pouvez me demander la température à un endroit, ou, vous pouvez dire stop... Comment puis-je vous aider?",
+		"HELP_REPROMPT": "Comment puis-je vous aider?",
+		"FALLBACK_MESSAGE": "La skill mon thermomètre ne peux vous aider avec cela. Je peux vous aider  si vous dites par exemple, quelle est la température dans le jardin. Comment puis-je vous aider?",
+		"FALLBACK_REPROMPT": "Comment puis-je vous aider?",
+		"ERROR_MESSAGE": "Désolé, une erreur est survenue.",
+		"STOP_MESSAGE": "Au revoir!",
+        "TEMPERATURE_MESSAGE": "La température {} {} est de {} degrés"
+	}
+}
