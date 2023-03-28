@@ -1,0 +1,138 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "mon thermomètre",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "temperature",
+          "slots": [
+            {
+              "name": "endroit",
+              "type": "capteur"
+            }
+          ],
+          "samples": [
+            "combien de degrés fait il dans la {endroit}",
+            "combien de degrés fait il dans le {endroit}",
+            "combien fait il dans la {endroit}",
+            "combien fait il dans le {endroit}",
+            "combien fait il dans {endroit}",
+            "quelle température fait il dans la {endroit}",
+            "quelle température fait il dans le {endroit}",
+            "quelle température fait il dans {endroit}",
+            "quelle est la température dans la {endroit}",
+            "quelle est la température dans le {endroit}",
+            "quelle est la température dans {endroit}"
+          ]
+        },
+        {
+          "name": "sensorlist",
+          "slots": [],
+          "samples": [
+            "donne moi la liste des capteurs",
+            "donne moi la liste des endroits",
+            "liste des capteurs",
+            "liste des endroits",
+            "quels capteurs sont disponibles",
+            "Quels endroits sont disponibles",
+            "Quelle est la liste des endroits",
+            "Quelle est la liste des capteurs"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "value": "terrasse"
+              }
+            },
+            {
+              "name": {
+                "value": "jardin"
+              }
+            },
+            {
+              "name": {
+                "value": "chambre de margaux"
+              }
+            },
+            {
+              "name": {
+                "value": "chambre de sandrine"
+              }
+            },
+            {
+              "name": {
+                "value": "piscine"
+              }
+            }
+          ],
+          "name": "capteur"
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "temperature",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "endroit",
+              "type": "capteur",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.980285236194.288252507178"
+              }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.980285236194.288252507178",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "à quel endroit?"
+          },
+          {
+            "type": "PlainText",
+            "value": "ou ça?"
+          },
+          {
+            "type": "PlainText",
+            "value": "ou?"
+          }
+        ]
+      }
+    ]
+  },
+  "version": "9"
+}
