@@ -5,9 +5,14 @@ from aws_cdk import (
     aws_iot as iot,
     aws_timestream as timestream,
     CfnParameter,
+    aws_iotevents as iotevents,
+    aws_sns as sns,
+    aws_sns_subscriptions as subscriptions
     # aws_sqs as sqs,
 )
 from constructs import Construct
+
+from esp8266tempsensors import esp8266tempsensors_monitoring_detectormodel
 
 
 class esp8266tempsensors(Stack):
@@ -19,6 +24,51 @@ class esp8266tempsensors(Stack):
         #we create the parameter for the Timstreamdb Name
         myTimeStreamDBName = CfnParameter(self, "timeStreamDBName", type="String",
             description="The name of the time stream DB where the data will be stored.")
+
+        ####################################################################################
+        # IoT Events
+
+        # IoT Events: Execution role
+        iot_events_execution_role = iam.Role(self, "IoTEventsExecutionRole", assumed_by=iam.ServicePrincipal("iotevents.amazonaws.com"))
+        iot_events_execution_role.add_to_policy(iam.PolicyStatement(
+            resources=["*"],
+            actions=["SNS:Publish"]
+        ))
+
+        # IoT Events: Input
+        inputDefinitionProperty = iotevents.CfnInput.InputDefinitionProperty(
+            attributes=[{"jsonPath": "devicename"}]
+        )
+
+        iot_events_input = iotevents.CfnInput(self, "esp8266tempsensorsConnectivityStatusInput",
+                                              input_definition=inputDefinitionProperty,
+                                              input_name="esp8266tempsensorsConnectivityStatusInput",
+                                              input_description="Input for connectivity status updates for esp8266tempsensors"
+
+                                              )
+        # IoT Events: Detector Model
+        detector_model_definition = iotevents.CfnDetectorModel.DetectorModelDefinitionProperty(
+            initial_state_name=esp8266tempsensors_monitoring_detectormodel.initial_state_name,
+            states=esp8266tempsensors_monitoring_detectormodel.get_states(self))
+
+        iot_events_model = iotevents.CfnDetectorModel(self, "esp8266tempsensorsConnectivityModel",
+                                                      detector_model_definition=detector_model_definition,
+                                                      detector_model_name="esp8266tempsensorsConnectivityModel",
+                                                      detector_model_description="Detector model for esp8266tempsensors connectivity status",
+                                                      key="devicename",
+                                                      evaluation_method="BATCH",
+                                                      role_arn=iot_events_execution_role.role_arn)
+
+
+        ####################################################################################
+        # SNS topic
+        sns_topic = sns.Topic(self, "esp8266tempsensorsNotificationTopic",
+                              display_name="Topic to use for notifications about esp8266tempsensors events like connect or disconnect",
+                              topic_name="esp8266tempsensorsNotificationTopic"
+                              )
+
+        email_address = CfnParameter(self, "emailforalarms")
+        sns_topic.add_subscription(subscriptions.EmailSubscription(email_address.value_as_string))
 
 
         #create the iot policy for the esp8266 sensors
@@ -115,4 +165,48 @@ class esp8266tempsensors(Stack):
                         
             # the properties below are optional
             rule_name="esp8266tempsensorsTopicRule",
+        )
+
+
+        #create the roles to allow the monitoring iot rule to send an iot Event and to write in the error log
+        myIoTEventsPublishRole = iam.Role(self, "IoTEventsPublishRole",
+            role_name="esp8266tempsensorsIoTEventsPublishRole",
+            assumed_by=iam.ServicePrincipal("iot.amazonaws.com"),
+            description="Role to allow the esp8266tempsensorsMonitoringTopicRule iot rule to send an IotEvents",
+            inline_policies={
+                'BatchPutMessage': iam.PolicyDocument(
+                    statements=[
+                        iam.PolicyStatement(
+                            effect=iam.Effect.ALLOW,
+                            actions=['iotevents:BatchPutMessage'],
+                            resources=['*']
+                        )
+                    ]
+                )
+            }
+        )
+
+        #create the iotrule to publish in IotEvents
+        myMonitoringTopicRule = iot.CfnTopicRule(self, "esp8266tempsensorsMonitoringTopicRule",
+            topic_rule_payload=iot.CfnTopicRule.TopicRulePayloadProperty(
+                actions=[iot.CfnTopicRule.ActionProperty(
+                    iot_events=iot.CfnTopicRule.IotEventsActionProperty(
+                        input_name=iot_events_input.input_name,
+                        batch_mode=False,
+                        role_arn=myIoTEventsPublishRole.role_arn                        
+                    )
+                )],
+                error_action=iot.CfnTopicRule.ActionProperty(
+                    cloudwatch_logs=iot.CfnTopicRule.CloudwatchLogsActionProperty(
+                        log_group_name=myCloudWatchLogGroupName,
+                        role_arn=myCloudwatchWriteRole.role_arn
+                    )
+                ),
+                sql="SELECT topic(2) as devicename FROM 'esp8266tempsensors/#'",
+
+                rule_disabled=False
+            ),
+                        
+            # the properties below are optional
+            rule_name="esp8266tempsensorsMonitoringTopicRule",
         )

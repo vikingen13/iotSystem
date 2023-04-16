@@ -22,7 +22,7 @@ esp8266TempSensorType:
 
 esp8266TempSensorInfraOnly:
 	source .venv/bin/activate; \
-	cdk deploy esp8266tempsensors --parameters timeStreamDBName=$(dbName)
+	cdk deploy esp8266tempsensors --parameters timeStreamDBName=$(dbName) --parameters emailforalarms=$(emailforalarms)
 
 esp8266SimpleTempSensorType:
 	aws iot create-thing-type --thing-type-name "esp8266_simple_temperature_sensor" --thing-type-properties thingTypeDescription="Temperature sensors built with esp8266 without screen"
