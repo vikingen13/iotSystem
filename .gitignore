@@ -6,7 +6,7 @@ __pycache__
 *.egg-info
 certificates/*/
 */sensors/*/
-
+.DS_Store
 # CDK asset staging directory
 .cdk.staging
 cdk.out
