@@ -1,138 +1,253 @@
 {
-  "interactionModel": {
-    "languageModel": {
-      "invocationName": "mon thermomètre",
-      "intents": [
-        {
-          "name": "AMAZON.CancelIntent",
-          "samples": []
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "mon thermomètre",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "temperature",
+                    "slots": [
+                        {
+                            "name": "endroit",
+                            "type": "capteur",
+                            "samples": [
+                                "{endroit}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "combien de degrés fait il dans la {endroit}",
+                        "combien de degrés fait il dans le {endroit}",
+                        "combien fait il dans la {endroit}",
+                        "combien fait il dans le {endroit}",
+                        "combien fait il dans {endroit}",
+                        "quelle température fait il dans la {endroit}",
+                        "quelle température fait il dans le {endroit}",
+                        "quelle température fait il dans {endroit}",
+                        "quelle est la température dans la {endroit}",
+                        "quelle est la température dans le {endroit}",
+                        "quelle est la température dans {endroit}"
+                    ]
+                },
+                {
+                    "name": "sensorlist",
+                    "slots": [],
+                    "samples": [
+                        "donne moi la liste des capteurs",
+                        "donne moi la liste des endroits",
+                        "liste des capteurs",
+                        "liste des endroits",
+                        "quels capteurs sont disponibles",
+                        "Quels endroits sont disponibles",
+                        "Quelle est la liste des endroits",
+                        "Quelle est la liste des capteurs"
+                    ]
+                },
+                {
+                    "name": "maxtemperature",
+                    "slots": [
+                        {
+                            "name": "endroit",
+                            "type": "capteur",
+                            "samples": [
+                                "{endroit}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "A t il fait chaud dans le {endroit} aujourd'hui",
+                        "A t il fait chaud aujourd'hui dans la {endroit}",
+                        "A t il fait chaud aujourd'hui dans {endroit}",
+                        "combien de degrés maximum a il fait dans {endroit} aujourd'hui",
+                        "combien de degrés maximum a il fait dans le {endroit} aujourd'hui",
+                        "combien de degrés maximum a il fait dans la {endroit} aujourd'hui",
+                        "quelle a été la température maximum dans la {endroit}",
+                        "quelle a été la température maximum dans la {endroit} aujourd'hui"
+                    ]
+                },
+                {
+                    "name": "mintemperature",
+                    "slots": [
+                        {
+                            "name": "endroit",
+                            "type": "capteur",
+                            "samples": [
+                                "{endroit}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "A t il fait froid dans le {endroit} aujourd'hui",
+                        "A t il fait froid aujourd'hui dans la {endroit}",
+                        "A t il fait froid aujourd'hui dans {endroit}",
+                        "combien de degrés minimum a il fait dans {endroit} aujourd'hui",
+                        "combien de degrés minimum a il fait dans le {endroit} aujourd'hui",
+                        "combien de degrés minimum a il fait dans la {endroit} aujourd'hui",
+                        "quelle a été la température minimum dans la {endroit} ",
+                        "quelle a été la température minimum dans la {endroit} aujourd'hui",
+                        "A t il fait froid dans le {endroit} cette nuit",
+                        "A t il fait froid cette nuit dans la {endroit}",
+                        "A t il fait froid cette nuit dans {endroit}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "capteur",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "terrasse"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "jardin"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "chambre de margaux"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "chambre de sandrine"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "piscine"
+                            }
+                        }
+                    ]
+                }
+            ]
         },
-        {
-          "name": "AMAZON.HelpIntent",
-          "samples": []
+        "dialog": {
+            "intents": [
+                {
+                    "name": "temperature",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "endroit",
+                            "type": "capteur",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.980285236194.288252507178"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "mintemperature",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "endroit",
+                            "type": "capteur",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.690965554800.888259700265"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "maxtemperature",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "endroit",
+                            "type": "capteur",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.924706044547.1607832580449"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
         },
-        {
-          "name": "AMAZON.StopIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.NavigateHomeIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.FallbackIntent",
-          "samples": []
-        },
-        {
-          "name": "temperature",
-          "slots": [
+        "prompts": [
             {
-              "name": "endroit",
-              "type": "capteur"
+                "id": "Elicit.Slot.980285236194.288252507178",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "à quel endroit?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "ou ça?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "ou?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.690965554800.888259700265",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "ou?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "ou ça?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "à quel endroit?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.924706044547.1607832580449",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "ou?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "ou ça?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "à quel endroit?"
+                    }
+                ]
             }
-          ],
-          "samples": [
-            "combien de degrés fait il dans la {endroit}",
-            "combien de degrés fait il dans le {endroit}",
-            "combien fait il dans la {endroit}",
-            "combien fait il dans le {endroit}",
-            "combien fait il dans {endroit}",
-            "quelle température fait il dans la {endroit}",
-            "quelle température fait il dans le {endroit}",
-            "quelle température fait il dans {endroit}",
-            "quelle est la température dans la {endroit}",
-            "quelle est la température dans le {endroit}",
-            "quelle est la température dans {endroit}"
-          ]
-        },
-        {
-          "name": "sensorlist",
-          "slots": [],
-          "samples": [
-            "donne moi la liste des capteurs",
-            "donne moi la liste des endroits",
-            "liste des capteurs",
-            "liste des endroits",
-            "quels capteurs sont disponibles",
-            "Quels endroits sont disponibles",
-            "Quelle est la liste des endroits",
-            "Quelle est la liste des capteurs"
-          ]
-        }
-      ],
-      "types": [
-        {
-          "values": [
-            {
-              "name": {
-                "value": "terrasse"
-              }
-            },
-            {
-              "name": {
-                "value": "jardin"
-              }
-            },
-            {
-              "name": {
-                "value": "chambre de margaux"
-              }
-            },
-            {
-              "name": {
-                "value": "chambre de sandrine"
-              }
-            },
-            {
-              "name": {
-                "value": "piscine"
-              }
-            }
-          ],
-          "name": "capteur"
-        }
-      ]
-    },
-    "dialog": {
-      "intents": [
-        {
-          "name": "temperature",
-          "confirmationRequired": false,
-          "prompts": {},
-          "slots": [
-            {
-              "name": "endroit",
-              "type": "capteur",
-              "elicitationRequired": true,
-              "confirmationRequired": false,
-              "prompts": {
-                "elicitation": "Elicit.Slot.980285236194.288252507178"
-              }
-            }
-          ]
-        }
-      ],
-      "delegationStrategy": "ALWAYS"
-    },
-    "prompts": [
-      {
-        "id": "Elicit.Slot.980285236194.288252507178",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "à quel endroit?"
-          },
-          {
-            "type": "PlainText",
-            "value": "ou ça?"
-          },
-          {
-            "type": "PlainText",
-            "value": "ou?"
-          }
         ]
-      }
-    ]
-  },
-  "version": "9"
+    }
 }

@@ -9,6 +9,8 @@
 		"FALLBACK_REPROMPT": "Comment puis-je vous aider?",
 		"ERROR_MESSAGE": "Désolé, une erreur est survenue.",
 		"STOP_MESSAGE": "Au revoir!",
-        "TEMPERATURE_MESSAGE": "La température {} {} est de {} degrés"
+        "TEMPERATURE_MESSAGE": "La température {} {} est de {} degrés",
+        "MAX_TEMPERATURE_MESSAGE": "La température maximum aujourd'hui {} {} a été de {} degrés",
+        "MIN_TEMPERATURE_MESSAGE": "La température minimum aujourd'hui {} {} a été de {} degrés"
 	}
 }

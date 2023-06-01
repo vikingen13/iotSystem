@@ -29,12 +29,23 @@ QueryDraginoLastExternal = "SELECT measure_value::double as temperature_internal
 Queryesp8266tempsensorsLast = "SELECT measure_value::double as temperature FROM \"{}\".\"esp8266tempsensors\" WHERE (measure_name = 'temperature') AND (device = '{}') ORDER BY time DESC LIMIT 1"
 Queryesp8266simpletempsensorsLast = "SELECT measure_value::double as temperature FROM \"{}\".\"esp8266simpletempsensors\" WHERE (measure_name = 'temperature') AND (device = '{}') ORDER BY time DESC LIMIT 1"
 
+QueryDraginoMaxValueInternal = "SELECT MAX(measure_value::double) as temperature_internal FROM \"{}\".\"draginodata\" WHERE measure_name = 'temperature_internal' AND device = '{}' AND time >= ago(24h)"
+QueryDraginoMaxExternal = "SELECT MAX(measure_value::double) as temperature_internal FROM \"{}\".\"draginodata\" WHERE measure_name = 'temperature_external' AND device = '{}' AND time >= ago(24h)"
+Queryesp8266tempsensorsMax = "SELECT MAX(measure_value::double) AS temperature FROM \"{}\".\"esp8266tempsensors\" WHERE (measure_name = 'temperature') AND (device = '{}') AND time >= ago(24h)"
+Queryesp8266simpletempsensorsMax = "SELECT MAX(measure_value::double) as temperature FROM \"{}\".\"esp8266simpletempsensors\" WHERE (measure_name = 'temperature') AND (device = '{}') AND time >= ago(24h)"
+
+QueryDraginoMinValueInternal = "SELECT MIN(measure_value::double) as temperature_internal FROM \"{}\".\"draginodata\" WHERE measure_name = 'temperature_internal' AND device = '{}' AND time >= ago(24h)"
+QueryDraginoMinExternal = "SELECT MIN(measure_value::double) as temperature_internal FROM \"{}\".\"draginodata\" WHERE measure_name = 'temperature_external' AND device = '{}' AND time >= ago(24h)"
+Queryesp8266tempsensorsMin = "SELECT MIN(measure_value::double) AS temperature FROM \"{}\".\"esp8266tempsensors\" WHERE (measure_name = 'temperature') AND (device = '{}') AND time >= ago(24h)"
+Queryesp8266simpletempsensorsMin = "SELECT MIN(measure_value::double) as temperature FROM \"{}\".\"esp8266simpletempsensors\" WHERE (measure_name = 'temperature') AND (device = '{}') AND time >= ago(24h)"
+
+
 CorrespondanceTable = {  
- "chambre de sandrine":{"name":"chambresandrine","query":Queryesp8266simpletempsensorsLast,"vocable":"dans la"},
- "chambre de margaux":{"name":"esp8266TempSensor1","query":Queryesp8266tempsensorsLast, "vocable":"dans la"},
- "terrasse":{"name":"4e056d74-38c0-4431-8ab6-d05b3dcda891","query":QueryDraginoLastValueInternal,"vocable":"sur la"},
- "jardin":{"name":"a0b65205-b976-40f7-8815-2f62bd3ae32c","query":QueryDraginoLastValueInternal,"vocable":"dans le"},
- "piscine":{"name":"a0b65205-b976-40f7-8815-2f62bd3ae32c","query":QueryDraginoLastExternal, "vocable":"de la"},
+ "chambre de sandrine":{"name":"chambresandrine","query":Queryesp8266simpletempsensorsLast,"query_max":Queryesp8266simpletempsensorsMax,"query_min":Queryesp8266simpletempsensorsMin,"vocable":"dans la"},
+ "chambre de margaux":{"name":"esp8266TempSensor1","query":Queryesp8266tempsensorsLast, "query_max":Queryesp8266tempsensorsMax,"query_min":Queryesp8266tempsensorsMin, "vocable":"dans la"},
+ "terrasse":{"name":"4e056d74-38c0-4431-8ab6-d05b3dcda891","query":QueryDraginoLastValueInternal,"query_max":QueryDraginoMaxValueInternal,"query_min":QueryDraginoMinValueInternal,"vocable":"sur la"},
+ "jardin":{"name":"a0b65205-b976-40f7-8815-2f62bd3ae32c","query":QueryDraginoLastValueInternal,"query_max":QueryDraginoMaxValueInternal,"query_min":QueryDraginoMinValueInternal,"vocable":"dans le"},
+ "piscine":{"name":"a0b65205-b976-40f7-8815-2f62bd3ae32c","query":QueryDraginoLastExternal, "query_max":QueryDraginoMaxExternal,"query_min":QueryDraginoMinExternal,"vocable":"de la"},
 }
 
 #class to display results on screen
@@ -82,7 +93,16 @@ class VisualHandler(AbstractRequestHandler):
             query = CorrespondanceTable[item]["query"].format(myDatabaseName,CorrespondanceTable[item]["name"])
             response = timestream.query(QueryString=query)
             myTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
-            myVisualResponse.addListItem(item + " : " +  str(round(float(myTemperature)))+"°C")
+
+            query = CorrespondanceTable[item]["query_max"].format(myDatabaseName,CorrespondanceTable[item]["name"])
+            response = timestream.query(QueryString=query)
+            myMaxTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+
+            query = CorrespondanceTable[item]["query_min"].format(myDatabaseName,CorrespondanceTable[item]["name"])
+            response = timestream.query(QueryString=query)
+            myMinTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+
+            myVisualResponse.addListItem(item + " : " +  str(round(float(myTemperature)))+"°C"+" / <span color=\"blue\">"+ str(round(float(myMinTemperature))) +"°C" +"</span> / <span color=\"red\">"+ str(round(float(myMaxTemperature))) +"°C</span>")
 
         #add the visual response to the response
         self.launch_screen(handler_input,visualresponse.APL_DOCUMENT_TOKEN,visualresponse.APL_DOCUMENT_ID,myVisualResponse.getResponse())
@@ -159,6 +179,99 @@ class TemperatureIntentHandler(VisualHandler):
         #.set_card(SimpleCard(data[prompts.SKILL_NAME], random_fact))
         return handler_input.response_builder.response
 
+#Intent Handler
+class MaxTemperatureIntentHandler(VisualHandler):
+    """Handler for skill launch and temperature Intent."""
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return (is_intent_name("maxtemperature")(handler_input))
+
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        logger.info("In maxtemperature handler")
+
+        # get localization data
+        data = handler_input.attributes_manager.request_attributes["_"]
+
+        # first, we retrieve the slot value with the sensor name
+        mySensorValue = get_slot(
+            handler_input=handler_input, slot_name="endroit").resolutions.resolutions_per_authority[0].values[0].value.name
+
+        #get the database name from the lambda function's environment variable
+        myDatabaseName = os.environ['DATABASE_NAME']
+
+        #connect to the timestream database
+        timestream = boto3.client('timestream-query')
+
+        #query the timestream database
+        query = CorrespondanceTable[mySensorValue]["query_max"].format(myDatabaseName,CorrespondanceTable[mySensorValue]["name"])
+        response = timestream.query(QueryString=query)
+
+        #extract the temperature from the response
+        myTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+
+        logger.info(response)  
+
+        speech = data[prompts.MAX_TEMPERATURE_MESSAGE].format(CorrespondanceTable[mySensorValue]["vocable"],mySensorValue,round(float(myTemperature)))
+
+        self.simpleVisual(handler_input,data)
+
+        handler_input.response_builder.speak(speech).set_card(
+            SimpleCard(data[prompts.SKILL_NAME], speech))
+
+        
+        #.set_card(SimpleCard(data[prompts.SKILL_NAME], random_fact))
+        return handler_input.response_builder.response
+
+#Intent Handler
+class MinTemperatureIntentHandler(VisualHandler):
+    """Handler for skill launch and temperature Intent."""
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return (is_intent_name("mintemperature")(handler_input))
+
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        logger.info("In mintemperature handler")
+
+        # get localization data
+        data = handler_input.attributes_manager.request_attributes["_"]
+
+        # first, we retrieve the slot value with the sensor name
+        mySensorValue = get_slot(
+            handler_input=handler_input, slot_name="endroit").resolutions.resolutions_per_authority[0].values[0].value.name
+
+        #get the database name from the lambda function's environment variable
+        myDatabaseName = os.environ['DATABASE_NAME']
+
+        #connect to the timestream database
+        timestream = boto3.client('timestream-query')
+
+        #query the timestream database
+        query = CorrespondanceTable[mySensorValue]["query_min"].format(myDatabaseName,CorrespondanceTable[mySensorValue]["name"])
+        response = timestream.query(QueryString=query)
+
+        #extract the temperature from the response
+        myTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+
+        logger.info(response)  
+
+        speech = data[prompts.MIN_TEMPERATURE_MESSAGE].format(CorrespondanceTable[mySensorValue]["vocable"],mySensorValue,round(float(myTemperature)))
+
+        self.simpleVisual(handler_input,data)
+
+        handler_input.response_builder.speak(speech).set_card(
+            SimpleCard(data[prompts.SKILL_NAME], speech))
+
+        
+        #.set_card(SimpleCard(data[prompts.SKILL_NAME], random_fact))
+        return handler_input.response_builder.response
+
+
 class SensorListIntentHandler(VisualHandler):
     """Handler for skill launch and temperature Intent."""
 
@@ -206,6 +319,7 @@ class HelpIntentHandler(AbstractRequestHandler):
             reprompt).set_card(SimpleCard(
                 data[prompts.SKILL_NAME], speech))
         return handler_input.response_builder.response
+
 
 
 class CancelOrStopIntentHandler(AbstractRequestHandler):
@@ -335,6 +449,8 @@ class ResponseLogger(AbstractResponseInterceptor):
 # Register intent handlers
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(TemperatureIntentHandler())
+sb.add_request_handler(MaxTemperatureIntentHandler())
+sb.add_request_handler(MinTemperatureIntentHandler())
 sb.add_request_handler(SensorListIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
