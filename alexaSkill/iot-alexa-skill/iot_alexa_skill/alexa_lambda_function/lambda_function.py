@@ -42,11 +42,17 @@ Queryesp8266simpletempsensorsMin = "SELECT MIN(measure_value::double) as tempera
 
 CorrespondanceTable = {  
  "chambre de sandrine":{"name":"chambresandrine","query":Queryesp8266simpletempsensorsLast,"query_max":Queryesp8266simpletempsensorsMax,"query_min":Queryesp8266simpletempsensorsMin,"vocable":"dans la"},
- "chambre de margaux":{"name":"esp8266TempSensor1","query":Queryesp8266tempsensorsLast, "query_max":Queryesp8266tempsensorsMax,"query_min":Queryesp8266tempsensorsMin, "vocable":"dans la"},
+ "bureau":{"name":"esp8266TempSensor1","query":Queryesp8266tempsensorsLast, "query_max":Queryesp8266tempsensorsMax,"query_min":Queryesp8266tempsensorsMin, "vocable":"dans le"},
  "terrasse":{"name":"4e056d74-38c0-4431-8ab6-d05b3dcda891","query":QueryDraginoLastValueInternal,"query_max":QueryDraginoMaxValueInternal,"query_min":QueryDraginoMinValueInternal,"vocable":"sur la"},
  "jardin":{"name":"a0b65205-b976-40f7-8815-2f62bd3ae32c","query":QueryDraginoLastValueInternal,"query_max":QueryDraginoMaxValueInternal,"query_min":QueryDraginoMinValueInternal,"vocable":"dans le"},
  "piscine":{"name":"a0b65205-b976-40f7-8815-2f62bd3ae32c","query":QueryDraginoLastExternal, "query_max":QueryDraginoMaxExternal,"query_min":QueryDraginoMinExternal,"vocable":"de la"},
 }
+
+def extractTemperatureFromResponse(aResponse):
+    try:
+        return aResponse["Rows"][0]["Data"][0]["ScalarValue"]
+    except:
+        return 0
 
 #class to display results on screen
 class VisualHandler(AbstractRequestHandler):
@@ -92,15 +98,15 @@ class VisualHandler(AbstractRequestHandler):
         for item in CorrespondanceTable:
             query = CorrespondanceTable[item]["query"].format(myDatabaseName,CorrespondanceTable[item]["name"])
             response = timestream.query(QueryString=query)
-            myTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+            myTemperature = extractTemperatureFromResponse(response)
 
             query = CorrespondanceTable[item]["query_max"].format(myDatabaseName,CorrespondanceTable[item]["name"])
             response = timestream.query(QueryString=query)
-            myMaxTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+            myMaxTemperature = extractTemperatureFromResponse(response)
 
             query = CorrespondanceTable[item]["query_min"].format(myDatabaseName,CorrespondanceTable[item]["name"])
             response = timestream.query(QueryString=query)
-            myMinTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+            myMinTemperature = extractTemperatureFromResponse(response)
 
             myVisualResponse.addListItem(item + " : " +  str(round(float(myTemperature)))+"°C"+" / <span color=\"blue\">"+ str(round(float(myMinTemperature))) +"°C" +"</span> / <span color=\"red\">"+ str(round(float(myMaxTemperature))) +"°C</span>")
 
@@ -164,7 +170,7 @@ class TemperatureIntentHandler(VisualHandler):
         response = timestream.query(QueryString=query)
 
         #extract the temperature from the response
-        myTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+        myTemperature = extractTemperatureFromResponse(response)
 
         logger.info(response)  
 
@@ -210,7 +216,7 @@ class MaxTemperatureIntentHandler(VisualHandler):
         response = timestream.query(QueryString=query)
 
         #extract the temperature from the response
-        myTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+        myTemperature = extractTemperatureFromResponse(response)
 
         logger.info(response)  
 
@@ -256,7 +262,7 @@ class MinTemperatureIntentHandler(VisualHandler):
         response = timestream.query(QueryString=query)
 
         #extract the temperature from the response
-        myTemperature = response["Rows"][0]["Data"][0]["ScalarValue"]
+        myTemperature = extractTemperatureFromResponse(response)
 
         logger.info(response)  
 
